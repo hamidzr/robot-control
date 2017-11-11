@@ -11,14 +11,23 @@ const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// serve static files in public dir
+app.use(express.static('public'))
+
 // serve the main page
-app.get('/', function(req, res) {
-    res.send('Welcome');
-});
+// app.get('/', function(req, res) {
+//     res.send('Welcome');
+// });
 
 // listen for socket connections
 io.on('connection', function(socket) {
     console.log('a user connected');
+    socket.on('submission', function(msg) {
+        console.log(msg);
+    })
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });
 })
 
 app.post('/command', function(req, res) {
