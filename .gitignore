@@ -4,5 +4,3 @@ node_modules
 npm-debug.log
 *.pem
 package-lock.json
-public/*.js
-public/*.map
