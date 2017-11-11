@@ -1,7 +1,9 @@
 const express = require('express'),
     bodyParser = require('body-parser'),
     { exec } = require('child_process'),
-    app = express();
+    app = express(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http);
 
 const port = process.env.PORT || 5000;
 
@@ -11,8 +13,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // serve the main page
 app.get('/', function(req, res) {
-   res.send('Welcome');
+    res.send('Welcome');
 });
+
+// listen for socket connections
+io.on('connection', function(socket) {
+    console.log('a user connected');
+})
 
 app.post('/command', function(req, res) {
     let commandJson = req.body;
@@ -32,6 +39,6 @@ app.post('/command', function(req, res) {
     res.status(200).send('command received.');
 });
 
-app.listen(port, function() {
+http.listen(port, function() {
     console.log('Listening on ' + port);
 });
