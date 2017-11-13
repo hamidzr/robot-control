@@ -17,8 +17,9 @@ let app = new Vue({
             try {
                 cmds = JSON.parse(this.commands);
                 // check for easy errors
+                let validCommands = ['left', 'right', 'stop'];
                 let allValid = cmds.every(cmd => {
-                    if (!isNaN(cmd) || cmd === 'left' || cmd === 'right') return true;
+                    if (!isNaN(cmd) || validCommands.includes(cmd)) return true;
                 });
                 return allValid;
             } catch (e) {
