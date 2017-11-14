@@ -1,13 +1,11 @@
-
 // establish socket connection
+// TODO add server connection info
 let socket = io();
-
 
 // vue goodness
 let app = new Vue({
     el: '#app',
     data: {
-        message: 'Hey you',
         commands: ''
     },
     computed: {
