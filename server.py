@@ -1,64 +1,41 @@
-import socket
-from collections import deque
-from threading import Thread
+import os
+from flask import Flask, render_template, Response
+from flask_socketio import SocketIO, emit
 
-class Communicate(object):
-    def __init__(self):
-        self.address = ""
-        self.port = 5580
-        self.finished = False
-        self.inbox = deque()
-        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.getMessagesThread = Thread(target=self.getMessages)
-        print(self.address)
-        return
-    
-    def setupLine(self, addr):
-        self.address = addr
-        if self.address is "": #i.e. server on raspberry pi
-            try:
-                self.connection.bind((self.address, self.port))
-                self.connection.listen(1)
-                self.connection, otherAddress = self.connection.accept()
-                print("connected to: " + otherAddress[0])
-            except socket.error as msg:
-                print(msg)
-        else:
-            self.connection.connect((self.address, self.port)) # i.e. client
-        self.getMessagesThread.start()
-        return
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret')
+socketio = SocketIO(app)
 
-    def sendMessage(self, msg):
-        self.connection.send(str.encode(msg))
-        return
 
-    def getMessages(self):
-        while not self.finished:
-            received = self.connection.recv(1024)
-            decoded = received.decode('utf-8')
-            if len(decoded) > 0:
-                if decoded == "connection closed.":
-                    print("connection closed.")
-                else:
-                    self.inbox.appendleft(decoded)
-        return
+def root_dir():  # pragma: no cover
+    return os.path.abspath(os.path.dirname(__file__))
 
-    def closeConnection(self):
-        self.finished = True
-        self.getMessagesThread.join()
-        self.connection.close()
-        return
-
-if(__name__ == "__main__"):
+def get_file(filename):  # pragma: no cover
     try:
-        robotServer = Communicate()
-        print("waiting for client to connect...")
-        robotServer.setupLine("")
-        print("connected!")
-        while(True):
-            if(len(robotServer.inbox) > 0):
-                print(robotServer.inbox.pop())
-    except Exception as e:
-        pass
-    finally:
-        robotServer.closeConnection()
+        src = os.path.join(root_dir(), filename)
+        # Figure out how flask returns static files
+        # Tried:
+        # - render_template
+        # - send_file
+        # This should not be so non-obvious
+        return open(src).read()
+    except IOError as exc:
+        return str(exc)
+
+@app.route('/')
+def index():
+    return Response(get_file('./public/index.html'), mimetype="text/html")
+    return render_template('index.html')
+
+@app.route('/main.js')
+def mainjs():
+    return Response(get_file('./public/main.js'), mimetype="text/html")
+    return render_template('index.html')
+
+@socketio.on('submission')
+def test_message(message):
+    print('got', message)
+    emit('my response', {'data': 'got it!'})
+
+if __name__ == '__main__':
+    socketio.run(app)
