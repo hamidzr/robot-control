@@ -1,6 +1,8 @@
 // establish socket connection
 // TODO add server connection info
-let socket = io();
+const SERVER_ADDRESS = 'localhost:5000'
+const socket = io(SERVER_ADDRESS);
+
 
 // vue goodness
 let app = new Vue({
@@ -21,7 +23,6 @@ let app = new Vue({
                 });
                 return allValid;
             } catch (e) {
-                console.log(e);
                 return false;
             }
         }
@@ -30,6 +31,7 @@ let app = new Vue({
         submit() {
             let cmds = JSON.parse(this.commands);
             socket.emit('submission', cmds);
+            console.log('submitted', cmds);
         }
     }
 });
