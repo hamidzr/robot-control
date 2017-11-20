@@ -4,15 +4,7 @@ function (callback) {
     core = this.core,
     logger = this.logger;
   
-  logger.debug('path:', core.getPath(activeNode));
-  logger.info('name:', core.getAttribute(activeNode, 'name'));
-  logger.warn('pos :', core.getRegistry(activeNode, 'position'));
-  logger.error('guid:', core.getGuid(activeNode));
-  
-  // Node.prototype.toString = function() {
-  //   return core.getAttribute(this, 'name');
-  // }
-
+  // locate the startNode in a set of nodes
   let findStartNode = function(nodes) {
     // TODO add start metanode
     let firstNode;
@@ -22,17 +14,24 @@ function (callback) {
     return firstNode;
   };
 
+  // get a node's name
   let getName = function(node) {
     return core.getAttribute(node, 'name');
   }
 
+  // describe a node for logging purposes
   let describe = function(node, log=false) {
     let msg = core.getAttribute(node, 'name');
     msg += ' ' + core.getAttribute(node, 'direction');
     if (log) console.log(msg);
     return msg;
   }
+  // Node.prototype.toString = function() {
+  //   return core.getAttribute(this, 'name');
+  // }
 
+
+  // turn node into a simple form
   let stripNode = function(node) {
     let metadata = {
       name: getName(node),
@@ -44,16 +43,16 @@ function (callback) {
   }
 
 
+  // check if a nodes is a stop node
   let isStopNode = function(node) {
     // TODO check using baseType
     return core.getAttribute(node, 'name') === 'Stop';
   };
 
-  // loads and returns the chain of nodes in order from srcNode
   let cmdChain = [];
+  // loads the chain of commands in order from srcNode
   let loadChain = function(srcNode) {
     if (!srcNode) throw new Error('trying to load undefined node');
-    console.log('cur srcNode', describe(srcNode));
 
     if (isStopNode(srcNode)) {
       console.log('loaded all blocks.');
