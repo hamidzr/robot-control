@@ -4,5 +4,4 @@
 ## Installation
 
 ### Python server
-Intall the following packages
-flask flask-socketio eventlet
+Intall the following packages for python server `flask flask-socketio eventlet`

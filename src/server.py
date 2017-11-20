@@ -19,12 +19,12 @@ def get_file(filename):
 
 @app.route('/')
 def index():
-    return Response(get_file('./public/index.html'), mimetype="text/html")
+    return Response(get_file('../public/index.html'), mimetype="text/html")
     return render_template('index.html')
 
 @app.route('/main.js')
 def mainjs():
-    return Response(get_file('./public/main.js'), mimetype="text/html")
+    return Response(get_file('../public/main.js'), mimetype="text/html")
     return render_template('index.html')
 
 @socketio.on('submission')

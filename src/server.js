@@ -1,5 +1,6 @@
 const express = require('express'),
     bodyParser = require('body-parser'),
+    path = require('path'),
     { exec } = require('child_process'),
     app = express(),
     http = require('http').Server(app),
@@ -12,12 +13,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // serve static files in public dir
-app.use(express.static('public'))
-
-// serve the main page
-// app.get('/', function(req, res) {
-//     res.send('Welcome');
-// });
+app.use(express.static(path.join(__dirname,'../public')))
 
 // listen for socket connections
 io.on('connection', function(socket) {
