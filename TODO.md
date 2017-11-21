@@ -1,0 +1,7 @@
+- [ ] add socketio support
+- [ ] add constraints
+    - multiple connections
+    - reverse connections
+    - long distances on move blocks
+    - redundant commands? 
+        - like 4 turns ?
