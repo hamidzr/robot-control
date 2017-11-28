@@ -12,21 +12,28 @@ function (callback) {
     })
   }
 
+  // emits and object through the socket
   function sendCmds(cmds) {
       // socket should be setup globally
+      if (!socket) handleError('Connection to robot is not ready.')
       socket.emit('submission', cmds);
       logger.info('sent commands', cmds);
+  }
+
+  // handle error and give user feedback
+  function handleError(msg) {
+    console.error(msg);
+    logger.info(msg);
   }
 
   // returns the targeted robot address
   let getRobotAddress = function(nodes) {
     let node =  nodes.find(node => getMetaName(node) === 'ConnectionParameters')
-    let addr = 'http://';
-    debugger;
-    addr += core.getAttribute(node, 'robotAddress');
-    addr += ':';
-    addr += core.getAttribute(node, 'portNumber');
-    return addr;
+    if (!node) handleError('Connection parameters are not set.');
+    let host = core.getAttribute(node, 'robotAddress');
+    let port = core.getAttribute(node, 'portNumber');
+    if (!host || !port) handleError('Setup connection parameters to robot.');
+    return 'http://'+host+':'+port;
   };
 
   // locate the startNode in a set of nodes
@@ -35,6 +42,7 @@ function (callback) {
     let firstNode;
     // return nodes.find(node => getMetaName(node) === 'Start')
     firstNode = nodes.find(node => core.getAttribute(node, 'name') === 'Start');
+    if (!firstNode) handleError('Start node not found.')
     return firstNode;
   };
 
@@ -49,28 +57,26 @@ function (callback) {
 
 
   // describe a node for logging purposes
-  let describe = function(node, log=false) {
+  function describe(node, log=false) {
     let msg = core.getAttribute(node, 'name');
     msg += ' ' + core.getAttribute(node, 'direction');
     if (log) console.log(msg);
     return msg;
   }
-  // Node.prototype.toString = function() {
-  //   return core.getAttribute(this, 'name');
-  // }
-
 
   // turn node into a simple form
-  let stripNode = function(node) {
+  function stripNode(node) {
     let metadata = {
       name: getName(node),
       direction: core.getAttribute(node, 'direction'),
       distance: core.getAttribute(node, 'distance'),
       type: getName(core.getBaseType(node))
     };
+    if (metadata.distance && metadata.distance > 9) {
+      handleError(metadata.name + ' Move distance is over the limit');
+    }
     return metadata;
   }
-
 
   // check if a nodes is a stop node
   let isStopNode = function(node) {
@@ -84,20 +90,19 @@ function (callback) {
     if (!srcNode) throw new Error('trying to load undefined node');
 
     if (isStopNode(srcNode)) {
-      console.log('loaded all blocks.');
       cmdChain.forEach(cmd => describe(cmd, true));
       cmdChain = cmdChain.map(stripNode);
-      console.log(cmdChain);
+      console.log('Command chain', cmdChain);
       // call the callback
       if (cb) cb(cmdChain);
-      return cmdChain;
+      return cmdChain; // promisify? 
     }
 
     // generalize to check if is a command node
     if (core.isConnection(srcNode)) {
       core.loadPointer(srcNode, 'dst', function (err, destNode) {
         if (err) {
-          console.log(err);
+          handleError(err);
           // Handle error
         }
         // load the destination
@@ -110,8 +115,7 @@ function (callback) {
       // (Here the connections that have sourceNode as source.)
       core.loadCollection(srcNode, 'src', function (err, connNodes) {
         if (err) {
-          console.error(err);
-          // Handle error
+          handleError(err);
         } else {
           if (connNodes.length > 1) throw new Error('more than one connection found.');
           // load the next one
@@ -119,12 +123,12 @@ function (callback) {
         }
       });
     }
-
   };
   
   core.loadSubTree(activeNode, function (err, nodes) {
     let connections = nodes.filter( node => core.isConnection(node));
     nodes = nodes.filter( node => !core.isConnection(node));
+    if (nodes.length < 3) handleError('Add more commands.')
 
     // find start and follow the chain
     let robotAddress = getRobotAddress(nodes);
@@ -133,7 +137,7 @@ function (callback) {
     loadChain(startNode, sendCmds);
     
     if (err) {
-      // Handle error
+      handleError(err);
     }
     // Here we have access to all the nodes that is contained in node
     // at any level.

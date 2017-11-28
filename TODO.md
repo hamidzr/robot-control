@@ -1,4 +1,4 @@
-- [ ] add socketio support
+- [x] add socketio support
 - [ ] add constraints
     - multiple connections
     - reverse connections
