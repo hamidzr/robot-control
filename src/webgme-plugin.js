@@ -2,22 +2,51 @@
 function (callback) {
   var activeNode = this.activeNode,
     core = this.core,
+    socket,
     logger = this.logger;
-  
+
+  function setupSocket(serverAddr) {
+    require(['/socket.io/socket.io.js'], function(_io) {
+      socket = _io(serverAddr);
+      logger.info('finished setting up socket connection.')
+    })
+  }
+
+  function sendCmds(cmds) {
+      // socket should be setup globally
+      socket.emit('submission', cmds);
+      logger.info('sent commands', cmds);
+  }
+
+  // returns the targeted robot address
+  let getRobotAddress = function(nodes) {
+    let node =  nodes.find(node => getMetaName(node) === 'ConnectionParameters')
+    let addr = 'http://';
+    debugger;
+    addr += core.getAttribute(node, 'robotAddress');
+    addr += ':';
+    addr += core.getAttribute(node, 'portNumber');
+    return addr;
+  };
+
   // locate the startNode in a set of nodes
   let findStartNode = function(nodes) {
     // TODO add start metanode
     let firstNode;
-    // return nodes.find(node => core.getBaseType(node) === 'Start')
+    // return nodes.find(node => getMetaName(node) === 'Start')
     firstNode = nodes.find(node => core.getAttribute(node, 'name') === 'Start');
-    console.log('firstNode:', firstNode);
     return firstNode;
   };
 
   // get a node's name
-  let getName = function(node) {
+  function getName(node) {
     return core.getAttribute(node, 'name');
   }
+
+  function getMetaName(node) {
+    return getName(core.getMetaType(node));
+  }
+
 
   // describe a node for logging purposes
   let describe = function(node, log=false) {
@@ -51,7 +80,7 @@ function (callback) {
 
   let cmdChain = [];
   // loads the chain of commands in order from srcNode
-  let loadChain = function(srcNode) {
+  let loadChain = function(srcNode, cb) {
     if (!srcNode) throw new Error('trying to load undefined node');
 
     if (isStopNode(srcNode)) {
@@ -59,6 +88,8 @@ function (callback) {
       cmdChain.forEach(cmd => describe(cmd, true));
       cmdChain = cmdChain.map(stripNode);
       console.log(cmdChain);
+      // call the callback
+      if (cb) cb(cmdChain);
       return cmdChain;
     }
 
@@ -96,8 +127,10 @@ function (callback) {
     nodes = nodes.filter( node => !core.isConnection(node));
 
     // find start and follow the chain
+    let robotAddress = getRobotAddress(nodes);
+    setupSocket(robotAddress);
     let startNode = findStartNode(nodes);
-    loadChain(startNode);
+    loadChain(startNode, sendCmds);
     
     if (err) {
       // Handle error
