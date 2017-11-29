@@ -5,19 +5,25 @@ function (callback) {
     socket,
     logger = this.logger;
 
-  function setupSocket(serverAddr) {
-    require(['/socket.io/socket.io.js'], function(_io) {
-      socket = _io(serverAddr);
-      logger.info('finished setting up socket connection.')
-    })
-  }
-
   // emits and object through the socket
   function sendCmds(cmds) {
-      // socket should be setup globally
-      if (!socket) handleError('Connection to robot is not ready.')
-      socket.emit('submission', cmds);
-      logger.info('sent commands', cmds);
+    // socket should be setup globally
+    if (!socket) handleError('Connection to robot is not ready.')
+    cmds = cmds
+      .filter(cmd => cmd.type === 'Move' || cmd.type === 'Turn')
+      .map(cmd => {
+        if (cmd.type === 'Turn') {
+          if (!['left', 'right'].includes(cmd.direction)) handleError('Bad direction.');
+          return cmd.direction;
+        }
+        if (cmd.type === 'Move') {
+          if (cmd.direction === 'forward') return cmd.distance;
+          if (cmd.direction === 'backward') return -1 * cmd.distance;
+          handleError('Bad or missing direction.');
+        }
+      })
+    socket.emit('submission', cmds);
+    logger.info('sent commands', cmds);
   }
 
   // handle error and give user feedback
@@ -40,8 +46,8 @@ function (callback) {
   let findStartNode = function(nodes) {
     // TODO add start metanode
     let firstNode;
-    // return nodes.find(node => getMetaName(node) === 'Start')
-    firstNode = nodes.find(node => core.getAttribute(node, 'name') === 'Start');
+    firstNode = nodes.find(node => getMetaName(node) === 'Start')
+    // firstNode = nodes.find(node => core.getAttribute(node, 'name') === 'Start');
     if (!firstNode) handleError('Start node not found.')
     return firstNode;
   };
@@ -86,7 +92,7 @@ function (callback) {
 
   let cmdChain = [];
   // loads the chain of commands in order from srcNode
-  let loadChain = function(srcNode, cb) {
+  let loadChain = function(srcNode) {
     if (!srcNode) throw new Error('trying to load undefined node');
 
     if (isStopNode(srcNode)) {
@@ -94,7 +100,7 @@ function (callback) {
       cmdChain = cmdChain.map(stripNode);
       console.log('Command chain', cmdChain);
       // call the callback
-      if (cb) cb(cmdChain);
+      sendCmds(cmdChain);
       return cmdChain; // promisify? 
     }
 
@@ -132,9 +138,13 @@ function (callback) {
 
     // find start and follow the chain
     let robotAddress = getRobotAddress(nodes);
-    setupSocket(robotAddress);
     let startNode = findStartNode(nodes);
-    loadChain(startNode, sendCmds);
+    // load socket.io and create a socket connection
+    require(['/socket.io/socket.io.js'], function(_io) {
+      socket = _io(robotAddress);
+      logger.info('finished setting up socket connection.')
+      loadChain(startNode);
+    })
     
     if (err) {
       handleError(err);
