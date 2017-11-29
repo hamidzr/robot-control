@@ -1,6 +1,12 @@
 {
   "components": {
-    "visualizers": {}
+    "visualizers": {},
+    "plugins": {
+      "CommandManager": {
+        "src": "src/plugins/CommandManager",
+        "test": "test/plugins/CommandManager"
+      }
+    }
   },
   "dependencies": {
     "visualizers": {
@@ -12,6 +18,7 @@
         "widget": "src/visualizers/widgets/ICore",
         "project": "webgme-icore"
       }
-    }
+    },
+    "plugins": {}
   }
 }
