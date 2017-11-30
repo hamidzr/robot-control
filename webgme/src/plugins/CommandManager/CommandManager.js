@@ -61,20 +61,24 @@ define([
             core = this.core,
             logger = this.logger;
 
-        function setupSocket(address) {
+        // promisify require
+        function requireP(scriptPath) {
             return new Promise((resolve, reject) => {
-                require(['/socket.io/socket.io.js'], function(_io) {
-                    let socket = _io(address);
-                    logger.info('finished setting up socket connection.');
-                    resolve(socket);
-                });
+                require([scriptPath], resolve);
+            });
+        }
+
+        function setupSocket(address) {
+            return requireP('/socket.io/socket.io.js').then( _io => {
+                let socket = _io(address);
+                logger.info('finished setting up socket connection.');
+                return socket;
             });
         }
 
         // emits and object through the socket
         function sendCmds(socket, cmds) {
-            // socket should be setup globally
-            if (!socket) handleError('Connection to robot is not ready.');
+            if (errors.length > 0) return; // there are erros
             cmds = cmds
                 .filter(cmd => cmd.type === 'Move' || cmd.type === 'Turn')
                 .map(cmd => {
@@ -89,6 +93,7 @@ define([
                     }
                 });
             socket.emit('submission', cmds);
+            console.log('sent commands', cmds);
             logger.info('sent commands', cmds);
         }
 
@@ -131,7 +136,7 @@ define([
 
         // describe a node for logging purposes
         function describe(node, log=false) {
-            let msg = core.getAttribute(node, 'name');
+            let msg = getName(node);
             msg += ' ' + core.getAttribute(node, 'direction');
             if (log) console.log(msg);
             return msg;
@@ -161,7 +166,10 @@ define([
             let cmdChain = [];
             return new Promise((resolve, reject) => {
                 let loadChain = function(srcNode) {
-                    if (!srcNode) throw new Error('trying to load undefined node');
+                    if (!srcNode) {
+                        reject('trying to load undefined node');
+                        return;
+                    }
 
                     if (isStopNode(srcNode)) {
                         cmdChain.forEach(cmd => describe(cmd, true));
@@ -189,7 +197,10 @@ define([
                             if (err) {
                                 handleError(err);
                             } else {
-                                if (connNodes.length > 1) throw new Error('more than one connection found.');
+                                if (connNodes.length > 1) {
+                                    reject('more than one connection found.');
+                                    return;
+                                }
                                 // load the next one
                                 loadChain(connNodes[0]);
                             }
@@ -200,6 +211,15 @@ define([
 
             });
         } // end of getCommandChain
+
+        function setResults() {
+            if (errors.length > 0) {
+                callback(errors.join(', '), self.result);
+            } else {
+                self.result.setSuccess(true);
+                callback(null, self.result);
+            }
+        }
         
         core.loadSubTree(activeNode, function (err, nodes) {
             errors = [];
@@ -217,17 +237,14 @@ define([
                 .then(([socket, cmdChain]) => {
                     sendCmds(socket, cmdChain);
                     // TODO have it wait for a push from the server
-                    self.result.setSuccess(true);
-                    if (errors.length > 0) {
-                        callback(errors.join(', '), self.result);
-                    } else {
-                        callback(null, self.result);
-                    }
+                    setResults();
                 })
-                .catch(handleError);
+                .catch( err => {
+                    handleError(err);
+                    setResults(); // no .finally..
+                })
         });
 
-        // callback(null, self.result);
     };
 
     return CommandManager;
