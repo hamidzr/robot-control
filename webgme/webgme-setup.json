@@ -6,6 +6,11 @@
         "src": "src/plugins/CommandManager",
         "test": "test/plugins/CommandManager"
       }
+    },
+    "decorators": {
+      "FSMDecorator": {
+        "src": "src/decorators/FSMDecorator"
+      }
     }
   },
   "dependencies": {
@@ -19,6 +24,7 @@
         "project": "webgme-icore"
       }
     },
-    "plugins": {}
+    "plugins": {},
+    "decorators": {}
   }
 }
