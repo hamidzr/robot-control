@@ -68,6 +68,7 @@ define([
             });
         }
 
+        // setup socket connection
         function setupSocket(address) {
             return requireP('/socket.io/socket.io.js').then( _io => {
                 let socket = _io(address);
@@ -76,8 +77,9 @@ define([
             });
         }
 
-        // emits and object through the socket
+        // emits an object through the socket
         function sendCmds(socket, cmds) {
+            const MSG_TYPE = 'submission';
             if (errors.length > 0) return; // there are erros
             cmds = cmds
                 .filter(cmd => cmd.type === 'Move' || cmd.type === 'Turn')
@@ -92,7 +94,7 @@ define([
                         handleError('Bad or missing direction.');
                     }
                 });
-            socket.emit('submission', cmds);
+            socket.emit(MSG_TYPE, cmds);
             console.log('sent commands', cmds);
             logger.info('sent commands', cmds);
         }
@@ -142,7 +144,7 @@ define([
             return msg;
         }
 
-        // turn node into a simple form
+        // turns a node into a simpler object
         function stripNode(node) {
             let metadata = {
                 name: getName(node),
@@ -212,6 +214,7 @@ define([
             });
         } // end of getCommandChain
 
+        // helper to set the results based on the encoutered errors and constraints
         function setResults() {
             if (errors.length > 0) {
                 callback(errors.join(', '), self.result);
@@ -223,7 +226,6 @@ define([
         
         core.loadSubTree(activeNode, function (err, nodes) {
             errors = [];
-            let connections = nodes.filter( node => core.isConnection(node));
             nodes = nodes.filter( node => !core.isConnection(node));
             if (nodes.length < 3) handleError('Add more commands.');
 
@@ -236,13 +238,13 @@ define([
             Promise.all([socketPromise, cmdChainPromise])
                 .then(([socket, cmdChain]) => {
                     sendCmds(socket, cmdChain);
-                    // TODO have it wait for a push from the server
+                    // TODO handle push updates
                     setResults();
                 })
                 .catch( err => {
                     handleError(err);
                     setResults(); // no .finally..
-                })
+                });
         });
 
     };
