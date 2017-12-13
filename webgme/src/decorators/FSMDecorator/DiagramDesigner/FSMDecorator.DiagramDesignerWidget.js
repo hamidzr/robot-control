@@ -24,16 +24,16 @@ define([
 
     'use strict';
 
-    var FSMDecorator,
-        DECORATOR_ID = 'FSMDecorator',
+    var RobotDecorator,
+        DECORATOR_ID = 'RobotDecorator',
         COMMAND_META_TYPES = ['Start', 'Move', 'Turn', 'Stop'];
 
-    FSMDecorator = function (options) {
+    RobotDecorator = function (options) {
         var opts = _.extend({}, options);
 
         ModelDecoratorDiagramDesignerWidget.apply(this, [opts]);
 
-        this.logger.debug('FSMDecorator ctor');
+        this.logger.debug('RobotDecorator ctor');
 
 
 
@@ -45,11 +45,11 @@ define([
         this.dropDown.setTitle('Next Action:');
     };
 
-    FSMDecorator.prototype = Object.create(ModelDecoratorDiagramDesignerWidget.prototype);
-    FSMDecorator.prototype.constructor = FSMDecorator;
-    FSMDecorator.prototype.DECORATORID = DECORATOR_ID;
+    RobotDecorator.prototype = Object.create(ModelDecoratorDiagramDesignerWidget.prototype);
+    RobotDecorator.prototype.constructor = RobotDecorator;
+    RobotDecorator.prototype.DECORATORID = DECORATOR_ID;
 
-    FSMDecorator.prototype.on_addTo = function () {
+    RobotDecorator.prototype.on_addTo = function () {
         var self = this,
             client = this._control._client,
             nodeObj = client.getNode(this._metaInfo[CONSTANTS.GME_ID]),
@@ -124,11 +124,11 @@ define([
         }
     };
 
-    FSMDecorator.prototype.destroy = function () {
+    RobotDecorator.prototype.destroy = function () {
         ModelDecoratorDiagramDesignerWidget.prototype.destroy.apply(this, arguments);
     };
 
-    FSMDecorator.prototype.update = function () {
+    RobotDecorator.prototype.update = function () {
         var client = this._control._client,
             nodeObj = client.getNode(this._metaInfo[CONSTANTS.GME_ID]);
 
@@ -137,5 +137,5 @@ define([
         ModelDecoratorDiagramDesignerWidget.prototype.update.apply(this, arguments);
     };
 
-    return FSMDecorator;
+    return RobotDecorator;
 });

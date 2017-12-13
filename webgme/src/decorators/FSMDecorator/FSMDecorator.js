@@ -6,34 +6,34 @@
 
 define([
     'js/Decorators/DecoratorBase',
-    './DiagramDesigner/FSMDecorator.DiagramDesignerWidget',
-    './PartBrowser/FSMDecorator.PartBrowserWidget'
-], function (DecoratorBase, FSMDecoratorDiagramDesignerWidget, FSMDecoratorPartBrowserWidget) {
+    './DiagramDesigner/RobotDecorator.DiagramDesignerWidget',
+    './PartBrowser/RobotDecorator.PartBrowserWidget'
+], function (DecoratorBase, RobotDecoratorDiagramDesignerWidget, RobotDecoratorPartBrowserWidget) {
 
     'use strict';
 
-    var FSMDecorator,
-        DECORATOR_ID = 'FSMDecorator';
+    var RobotDecorator,
+        DECORATOR_ID = 'RobotDecorator';
 
-    FSMDecorator = function (params) {
+    RobotDecorator = function (params) {
         var opts = _.extend({loggerName: this.DECORATORID}, params);
 
         DecoratorBase.apply(this, [opts]);
 
-        this.logger.debug('FSMDecorator ctor');
+        this.logger.debug('RobotDecorator ctor');
     };
 
-    _.extend(FSMDecorator.prototype, DecoratorBase.prototype);
-    FSMDecorator.prototype.DECORATORID = DECORATOR_ID;
+    _.extend(RobotDecorator.prototype, DecoratorBase.prototype);
+    RobotDecorator.prototype.DECORATORID = DECORATOR_ID;
 
     /*********************** OVERRIDE DecoratorBase MEMBERS **************************/
 
-    FSMDecorator.prototype.initializeSupportedWidgetMap = function () {
+    RobotDecorator.prototype.initializeSupportedWidgetMap = function () {
         this.supportedWidgetMap = {
-            DiagramDesigner: FSMDecoratorDiagramDesignerWidget,
-            PartBrowser: FSMDecoratorPartBrowserWidget
+            DiagramDesigner: RobotDecoratorDiagramDesignerWidget,
+            PartBrowser: RobotDecoratorPartBrowserWidget
         };
     };
 
-    return FSMDecorator;
+    return RobotDecorator;
 });

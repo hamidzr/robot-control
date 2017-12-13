@@ -8,8 +8,8 @@
       }
     },
     "decorators": {
-      "FSMDecorator": {
-        "src": "src/decorators/FSMDecorator"
+      "RobotDecorator": {
+        "src": "src/decorators/RobotDecorator"
       }
     }
   },

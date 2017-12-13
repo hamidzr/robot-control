@@ -17,33 +17,33 @@ define([
 
     'use strict';
 
-    var FSMDecoratorPartBrowserWidget,
-        DECORATOR_ID = 'FSMDecoratorPartBrowserWidget';
+    var RobotDecoratorPartBrowserWidget,
+        DECORATOR_ID = 'RobotDecoratorPartBrowserWidget';
 
-    FSMDecoratorPartBrowserWidget = function (options) {
+    RobotDecoratorPartBrowserWidget = function (options) {
         var opts = _.extend({}, options);
 
         ModelDecoratorPartBrowserWidget.apply(this, [opts]);
 
-        this.logger.debug('FSMDecoratorPartBrowserWidget ctor');
+        this.logger.debug('RobotDecoratorPartBrowserWidget ctor');
     };
 
-    _.extend(FSMDecoratorPartBrowserWidget.prototype, ModelDecoratorPartBrowserWidget.prototype);
-    FSMDecoratorPartBrowserWidget.prototype.DECORATORID = DECORATOR_ID;
+    _.extend(RobotDecoratorPartBrowserWidget.prototype, ModelDecoratorPartBrowserWidget.prototype);
+    RobotDecoratorPartBrowserWidget.prototype.DECORATORID = DECORATOR_ID;
 
     /*********************** OVERRIDE DiagramDesignerWidgetDecoratorBase MEMBERS **************************/
 
-    FSMDecoratorPartBrowserWidget.prototype.beforeAppend = function () {
+    RobotDecoratorPartBrowserWidget.prototype.beforeAppend = function () {
         ModelDecoratorPartBrowserWidget.prototype.beforeAppend.apply(this, arguments);
     };
 
-    FSMDecoratorPartBrowserWidget.prototype.afterAppend = function () {
+    RobotDecoratorPartBrowserWidget.prototype.afterAppend = function () {
         ModelDecoratorPartBrowserWidget.prototype.afterAppend.apply(this, arguments);
     };
 
-    FSMDecoratorPartBrowserWidget.prototype.update = function () {
+    RobotDecoratorPartBrowserWidget.prototype.update = function () {
         ModelDecoratorPartBrowserWidget.prototype.update.apply(this, arguments);
     };
 
-    return FSMDecoratorPartBrowserWidget;
+    return RobotDecoratorPartBrowserWidget;
 });
