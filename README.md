@@ -9,8 +9,7 @@ To run the WebGME server with robotics capabilities, run `npm i && webgme start`
 - To use the node server run `npm install && npm start`
 
 ## Project Structure
- - `src/server.*`: contains simple websocket server implementations for node and flask
- - `src/webgme-plugin.js`: an early version of the plugin
+ - `src/server.js`: contains simple websocket server implementations for node
  - `public`: simple vue.js powered interface to interactively test the robots
  - `webgme`: our installation of webgme containing the plugin and decorator
  
