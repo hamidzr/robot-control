@@ -9,6 +9,7 @@ var config = require('webgme/config/config.default'),
 // The paths can be loaded from the webgme-setup.json
 config.plugin.basePaths.push(__dirname + '/../src/plugins');
 config.visualization.decoratorPaths.push(__dirname + '/../src/decorators');
+config.visualization.decoratorPaths.push(__dirname + '/../node_modules/webgme-connection-remover/src/decorators');
 
 
 
@@ -21,6 +22,7 @@ config.visualization.panelPaths.push(__dirname + '/../node_modules/webgme-icore/
 config.visualization.visualizerDescriptors.push(__dirname + '/../src/visualizers/Visualizers.json');
 // Add requirejs paths
 config.requirejsPaths = {
+  'ConnRemoverDecorator': 'node_modules/webgme-connection-remover/src/decorators/ConnRemoverDecorator',
   'ICore': 'panels/ICore/ICorePanel',
   'panels': './src/visualizers/panels',
   'widgets': './src/visualizers/widgets',

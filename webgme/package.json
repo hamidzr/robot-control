@@ -23,6 +23,7 @@
     "chai": "^3.0.0"
   },
   "dependencies": {
+    "webgme-connection-remover": "^1.0.0",
     "webgme-icore": "^1.0.1"
   },
   "description": "First, install the webgme following: - [NodeJS](https://nodejs.org/en/) (v4.x.x recommended) - [MongoDB](https://www.mongodb.com/)",

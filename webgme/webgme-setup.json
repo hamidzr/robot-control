@@ -25,6 +25,11 @@
       }
     },
     "plugins": {},
-    "decorators": {}
+    "decorators": {
+      "ConnRemoverDecorator": {
+        "project": "webgme-connection-remover",
+        "path": "node_modules/webgme-connection-remover/src/decorators/ConnRemoverDecorator"
+      }
+    }
   }
 }
