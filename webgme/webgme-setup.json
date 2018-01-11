@@ -11,7 +11,13 @@
       "RobotDecorator": {
         "src": "src/decorators/RobotDecorator"
       }
-    }
+    },
+    "seeds": {
+      "Robot": {
+        "src": "src/seeds/Robot"
+      }
+    },
+    "routers": {}
   },
   "dependencies": {
     "visualizers": {
@@ -22,6 +28,14 @@
         "secondary": false,
         "widget": "src/visualizers/widgets/ICore",
         "project": "webgme-icore"
+      },
+      "UIReplay": {
+        "src": "panels/UIReplay/UIReplayControllers",
+        "title": "UIReplay",
+        "panel": "src/visualizers/panels/UIReplay",
+        "secondary": true,
+        "widget": "src/visualizers/widgets/UIReplay",
+        "project": "webgme-ui-replay"
       }
     },
     "plugins": {},
@@ -29,6 +43,14 @@
       "ConnRemoverDecorator": {
         "project": "webgme-connection-remover",
         "path": "node_modules/webgme-connection-remover/src/decorators/ConnRemoverDecorator"
+      }
+    },
+    "seeds": {},
+    "routers": {
+      "UIRecorder": {
+        "project": "webgme-ui-replay",
+        "path": "node_modules/webgme-ui-replay/src/routers/UIRecorder",
+        "mount": "routers/UIRecorder"
       }
     }
   }

@@ -14,17 +14,16 @@
     "clean_up": "node ./node_modules/webgme-engine/src/bin/clean_up.js"
   },
   "version": "0.1.0",
-  "peerDependencies": {
-    "webgme": "^2.0.0"
-  },
   "devDependencies": {
     "mocha": "^2.2.5",
     "rimraf": "^2.4.0",
     "chai": "^3.0.0"
   },
   "dependencies": {
+    "webgme": "webgme/webgme#51f171a868c1a7485df97e9ee51b3d728090bf8f",
     "webgme-connection-remover": "^1.0.0",
-    "webgme-icore": "^1.0.1"
+    "webgme-icore": "^1.0.1",
+    "webgme-ui-replay": "^0.1.1"
   },
   "description": "First, install the webgme following: - [NodeJS](https://nodejs.org/en/) (v4.x.x recommended) - [MongoDB](https://www.mongodb.com/)",
   "main": "app.js",

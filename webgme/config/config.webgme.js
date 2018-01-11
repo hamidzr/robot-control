@@ -10,22 +10,28 @@ var config = require('webgme/config/config.default'),
 config.plugin.basePaths.push(__dirname + '/../src/plugins');
 config.visualization.decoratorPaths.push(__dirname + '/../src/decorators');
 config.visualization.decoratorPaths.push(__dirname + '/../node_modules/webgme-connection-remover/src/decorators');
+config.seedProjects.basePaths.push(__dirname + '/../src/seeds/Robot');
 
 
 
 config.visualization.panelPaths.push(__dirname + '/../node_modules/webgme-icore/src/visualizers/panels');
+config.visualization.panelPaths.push(__dirname + '/../node_modules/webgme-ui-replay/src/visualizers/panels');
 
 
-
+config.rest.components['routers/UIRecorder'] = __dirname + '/../node_modules/webgme-ui-replay/src/routers/UIRecorder/UIRecorder.js';
 
 // Visualizer descriptors
 config.visualization.visualizerDescriptors.push(__dirname + '/../src/visualizers/Visualizers.json');
 // Add requirejs paths
 config.requirejsPaths = {
+  'UIRecorder': 'node_modules/webgme-ui-replay/src/routers/UIRecorder',
   'ConnRemoverDecorator': 'node_modules/webgme-connection-remover/src/decorators/ConnRemoverDecorator',
+  'UIReplay': 'panels/UIReplay/UIReplayControllers',
   'ICore': 'panels/ICore/ICorePanel',
   'panels': './src/visualizers/panels',
   'widgets': './src/visualizers/widgets',
+  'panels/UIReplay': './node_modules/webgme-ui-replay/src/visualizers/panels/UIReplay',
+  'widgets/UIReplay': './node_modules/webgme-ui-replay/src/visualizers/widgets/UIReplay',
   'panels/ICore': './node_modules/webgme-icore/src/visualizers/panels/ICore',
   'widgets/ICore': './node_modules/webgme-icore/src/visualizers/widgets/ICore'
 };
