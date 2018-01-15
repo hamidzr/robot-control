@@ -68,13 +68,22 @@ define([
             });
         }
 
-        // setup socket connection
+        // setup socket connection, caller has to check for connection
         function setupSocket(address) {
-            return requireP('/socket.io/socket.io.js').then( _io => {
-                let socket = _io(address);
-                logger.info('finished setting up socket connection.');
-                return socket;
-            });
+            // socket.connected
+            if (window._robotSocket) {
+                console.log('reusing existing connection');
+                return Promise.resolve(window._robotSocket);
+            } else {
+                return requireP('/socket.io/socket.io.js').then( _io => {
+                    let socket = _io(address);
+                    window._robotSocket = socket;
+                    socket.on('connect', () => {
+                        console.log('socket connected');
+                    })
+                    return socket;
+                });
+            }
         }
 
         // emits an object through the socket
